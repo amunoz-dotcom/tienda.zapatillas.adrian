@@ -1,0 +1,28 @@
+<form id="checkout-form" class="checkout-form">
+    <h2 class="checkout-title">Order preferences</h2>
+    <p class="checkout-intro">Personalize the details of your order.</p>
+    <div class="checkout-fields">
+        <label for="campo_regalo">Free gift</label>
+        <select id="campo_regalo" name="regaloPromocional">
+            <option value="Spray protector de zapatillas">Waterproof shoe protector spray</option>
+            <option value="Kit de limpieza de zapatillas">Express cleaning kit</option>
+            <option value="Cordones extra (Blancos y Negros)">Extra shoelace set</option>
+        </select>
+        <label for="campo_embalaje">Packaging</label>
+        <select id="campo_embalaje" name="tipoEmbalaje">
+            <option value="Caja doble reforzada para coleccionistas">Reinforced collector's box</option>
+            <option value="Embalaje ecológico sin plástico">Plastic-free eco packaging</option>
+        </select>
+        <label for="campo_talla_calcetines">Gift sock size</label>
+        <select id="campo_talla_calcetines" name="tallaCalcetinesRegalo">
+            <option value="S (35-38)">S (35-38)</option>
+            <option value="M (39-42)">M (39-42)</option>
+            <option value="L (43-46)">L (43-46)</option>
+        </select>
+    </div>
+    <p class="checkout-error" role="alert" hidden></p>
+    <div class="checkout-actions">
+        <button type="button" class="checkout-button checkout-button--secondary" id="checkout-back-payment">Back to payment</button>
+        <button type="submit" class="checkout-button" id="aceptar_paso_preferencias">Review order</button>
+    </div>
+</form>

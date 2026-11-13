@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{admin.form.product.new}">Registrar zapatilla</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div th:insert="~{fragments/general.html :: menu}"></div>
+<main class="admin-page">
+    <h1 class="admin-page__title" th:text="#{admin.form.product.new}">Registrar zapatilla</h1>
+    <form class="admin-page__form" th:action="@{/admin/guardarZapatilla}" th:object="${nuevo}" method="post" enctype="multipart/form-data">
+        <p class="image-upload-error" th:if="${errorImagen}" th:text="${errorImagen}" role="alert"></p>
+        <label for="modelo" th:text="#{admin.model}">Modelo</label>
+        <input type="text" id="modelo" th:field="*{modelo}" required>
+        <span th:if="${#fields.hasErrors('modelo')}" th:errors="*{modelo}" style="color:red"></span>
+        <label for="marca" th:text="#{admin.brand.label}">Marca</label>
+        <input type="text" id="marca" th:field="*{marca}">
+        <label for="precio" th:text="#{admin.price} + ' (€)'">Precio (€)</label>
+        <input type="number" id="precio" th:field="*{precio}" min="1" max="99999" step="0.01" required>
+        <span th:if="${#fields.hasErrors('precio')}" th:errors="*{precio}" style="color:red"></span>
+        <label for="color" th:text="#{admin.color}">Color</label>
+        <input type="text" id="color" th:field="*{color}">
+        <label for="talla" th:text="#{admin.size}">Talla</label>
+        <input type="number" id="talla" th:field="*{talla}" min="1" step="0.5">
+        <label for="descripcion" th:text="#{admin.description}">Descripción</label>
+        <textarea id="descripcion" th:field="*{descripcion}"></textarea>
+        <label for="idCategoria" th:text="#{admin.form.category}">Categoría</label>
+        <select id="idCategoria" th:field="*{idCategoria}" required>
+            <option value="" disabled th:text="#{admin.form.category}">Selecciona categoría</option>
+            <option th:each="c : ${categorias}" th:text="${c.nombre}" th:value="${c.id}"></option>
+        </select>
+        <label for="imagenes" th:text="#{admin.form.cover}">Imágenes del producto</label>
+        <input type="file" id="imagenes" name="imagenes" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple required>
+        <p class="image-upload-hint" th:text="|JPEG, JPG, PNG o WEBP. De ${imagenMinAncho} × ${imagenMinAlto} a ${imagenMaxAncho} × ${imagenMaxAlto} píxeles; máximo ${imagenMaxPesoMb} MB por imagen.|"></p>
+        <div class="product-image-previews" id="nuevas-imagenes-preview" data-default-cover="true"></div>
+        <p>Selecciona la imagen de portada entre las imágenes elegidas.</p>
+        <button type="submit" th:text="#{admin.form.register}">Registrar</button>
+    </form>
+    <a class="admin-page__back" th:href="@{/admin/gestionarZapatillas}" th:text="#{admin.form.back}">Volver al listado</a>
+</main>
+<script th:src="@{/js/galeria-admin.js}" defer></script>
+</body>
+</html>

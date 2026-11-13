@@ -1,0 +1,21 @@
+<h2 class="cart-title">Shopping cart</h2>
+<div class="product-grid">
+  {{#.}}
+  <div class="product-card">
+    <strong>MODEL: {{MODELO}}</strong>
+    <img class="imagen-producto" src="mostrar_miniatura?id={{ZAPATILLA_ID}}" alt="{{MODELO}}" loading="lazy" />
+    <div>Price: {{PRECIO}} &euro;</div>
+    <div style="margin-top: 6px;">
+      <label for="cantidad-{{ZAPATILLA_ID}}">Quantity:</label>
+      <input class="border cart-quantity" id="cantidad-{{ZAPATILLA_ID}}" data-product-id="{{ZAPATILLA_ID}}" type="number" value="{{CANTIDAD}}" min="1" inputmode="numeric" />
+    </div>
+    <div style="margin-top: 10px;">
+      <button type="button" class="btn-details cart-remove" data-product-id="{{ZAPATILLA_ID}}">Remove from cart</button>
+    </div>
+  </div>
+  {{/.}}
+</div>
+<div class="cart-actions">
+  <button type="button" class="checkout-button checkout-button--secondary" id="seguir_comprando">Continue shopping</button>
+  <button type="button" class="checkout-button" id="realizar_pedido">Continue to checkout</button>
+</div>

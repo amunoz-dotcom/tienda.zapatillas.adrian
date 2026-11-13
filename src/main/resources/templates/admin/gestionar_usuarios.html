@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{admin.users.title}">Usuarios</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div th:insert="~{fragments/general.html :: menu}"></div>
+<main class="admin-page">
+    <h1 class="admin-page__title" th:text="#{admin.users.title}">Usuarios</h1>
+    <div class="admin-page__toolbar">
+        <a class="admin-page__button" th:href="@{/admin/registrarUsuario}" th:text="#{admin.users.create}">Nuevo usuario</a>
+    </div>
+    <div class="admin-page__list">
+        <article class="admin-page__card" th:each="u : ${usuarios}">
+            <h2 th:text="${u.nombre}"></h2>
+            <p><strong th:text="#{admin.email} + ':'">Correo electrónico:</strong> <span th:text="${u.email}"></span></p>
+            <p><strong th:text="#{admin.address} + ':'">Dirección:</strong> <span th:text="${u.direccion}"></span></p>
+            <p><strong th:text="#{admin.position} + ':'">Puesto:</strong> <span th:text="${u.puesto}"></span></p>
+            <p><strong th:text="#{admin.salary} + ':'">Salario:</strong> <span th:text="|${u.salario} €|"></span></p>
+            <a class="admin-page__button admin-page__button--secondary"
+               th:href="@{/admin/editarUsuario(id=${u.id})}" th:text="#{admin.edit}">Editar</a>
+            <a class="admin-page__button" th:href="@{/admin/borrarUsuario(id=${u.id})}"
+               th:attr="data-confirm=#{admin.confirm.delete}" onclick="return confirm(this.dataset.confirm)"
+               th:text="#{admin.delete}">Eliminar</a>
+        </article>
+    </div>
+    <p class="admin-page__empty" th:if="${usuarios.isEmpty()}" th:text="#{admin.users.empty}">No hay usuarios registrados.</p>
+    <nav class="admin-page__pagination" th:if="${pagina.totalPages > 1}" th:aria-label="#{admin.users.title}">
+        <a th:if="${pagina.hasPrevious()}" th:href="@{/admin/gestionarUsuarios(pagina=${pagina.number - 1})}"
+           th:text="#{admin.previous}">Anterior</a>
+        <span th:text="#{admin.page(${pagina.number + 1},${pagina.totalPages})}">Página</span>
+        <a th:if="${pagina.hasNext()}" th:href="@{/admin/gestionarUsuarios(pagina=${pagina.number + 1})}"
+           th:text="#{admin.next}">Siguiente</a>
+    </nav>
+</main>
+</body>
+</html>

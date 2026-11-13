@@ -1,0 +1,25 @@
+<form id="checkout-form" class="checkout-form">
+    <h2 class="checkout-title">Payment details</h2>
+    <p class="checkout-intro">Demo payment: no charge will be made.</p>
+    <div class="checkout-fields">
+        <label for="tipo_tarjeta">Card type</label>
+        <select id="tipo_tarjeta" name="tipoTarjeta" required>
+            <option value="" selected disabled>Choose a card</option>
+            <option value="visa">VISA</option>
+            <option value="master_card">Mastercard</option>
+        </select>
+        <label for="numero_tarjeta">Card number</label>
+        <input type="text" id="numero_tarjeta" name="numero" inputmode="numeric" autocomplete="cc-number"
+               placeholder="0000 0000 0000 0000" maxlength="23" pattern="[0-9 -]{12,23}" required>
+        <label for="titular_tarjeta">Cardholder name</label>
+        <input type="text" id="titular_tarjeta" name="titular" autocomplete="cc-name" maxlength="100" required>
+        <label for="fecha_caducidad">Expiry date (MM/YY)</label>
+        <input type="text" id="fecha_caducidad" name="fechaCaducidad" inputmode="numeric"
+               autocomplete="cc-exp" placeholder="MM/YY" maxlength="5" pattern="(0[1-9]|1[0-2])/[0-9]{2}" required>
+    </div>
+    <p class="checkout-error" role="alert" hidden></p>
+    <div class="checkout-actions">
+        <button type="button" class="checkout-button checkout-button--secondary" id="checkout-back-shipping">Back to shipping</button>
+        <button type="submit" class="checkout-button" id="aceptar_paso_2">Continue</button>
+    </div>
+</form>

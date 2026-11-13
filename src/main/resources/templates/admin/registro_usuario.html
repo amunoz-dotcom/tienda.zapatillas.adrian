@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${usuario.id == 0} ? #{admin.form.user.new} : #{admin.form.user.edit}">Usuario</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div th:insert="~{fragments/general.html :: menu}"></div>
+<main class="admin-page">
+    <h1 class="admin-page__title" th:text="${usuario.id == 0} ? #{admin.form.user.new} : #{admin.form.user.edit}">
+        Registrar usuario
+    </h1>
+    <form class="admin-page__form" th:action="@{/admin/guardarUsuario}" th:object="${usuario}" method="post">
+        <input type="hidden" th:field="*{id}">
+        <label for="nombre" th:text="#{admin.name}">Nombre</label>
+        <input type="text" id="nombre" th:field="*{nombre}" required>
+        <label for="email" th:text="#{admin.email}">Correo electrónico</label>
+        <input type="email" id="email" th:field="*{email}" required>
+        <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color:red"></span>
+        <label for="pass" th:text="#{admin.password}">Contraseña</label>
+        <input type="password" id="pass" th:field="*{pass}" required>
+        <span th:if="${#fields.hasErrors('pass')}" th:errors="*{pass}" style="color:red"></span>
+        <label for="direccion" th:text="#{admin.address}">Dirección</label>
+        <input type="text" id="direccion" th:field="*{direccion}" required>
+        <span th:if="${#fields.hasErrors('direccion')}" th:errors="*{direccion}" style="color:red"></span>
+        <label for="puesto" th:text="#{admin.position}">Puesto</label>
+        <input type="text" id="puesto" th:field="*{puesto}" required>
+        <span th:if="${#fields.hasErrors('puesto')}" th:errors="*{puesto}" style="color:red"></span>
+        <label for="salario" th:text="#{admin.salary} + ' (€)'">Salario (€)</label>
+        <input type="number" step="0.01" min="0" id="salario" th:field="*{salario}" required>
+        <span th:if="${#fields.hasErrors('salario')}" th:errors="*{salario}" style="color:red"></span>
+        <button type="submit" th:text="${usuario.id == 0} ? #{admin.form.save} : #{admin.form.update}">Guardar</button>
+    </form>
+    <a class="admin-page__back" th:href="@{/admin/gestionarUsuarios}" th:text="#{admin.form.back}">Volver al listado</a>
+</main>
+</body>
+</html>

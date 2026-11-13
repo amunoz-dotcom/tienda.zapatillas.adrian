@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{admin.login.title}">Acceso a administración</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<header class="admin-login-header">
+    <nav class="admin-menu__languages" th:aria-label="#{admin.language}">
+        <a th:href="@{/loginAdmin(idioma='es')}" th:attr="aria-current=${#locale.language == 'es' ? 'true' : null}">ES</a>
+        <a th:href="@{/loginAdmin(idioma='en')}" th:attr="aria-current=${#locale.language == 'en' ? 'true' : null}">EN</a>
+        <a th:href="@{/loginAdmin(idioma='fr')}" th:attr="aria-current=${#locale.language == 'fr' ? 'true' : null}">FR</a>
+    </nav>
+    <a th:href="@{/}" th:text="#{admin.store}">Volver a la tienda</a>
+</header>
+<main class="admin-page">
+    <h1 class="admin-page__title" th:text="#{admin.login.title}">Acceso a administración</h1>
+    <form class="admin-page__form" th:action="@{/admin/gestionarZapatillas}" method="get">
+        <p th:text="#{admin.login.prompt}">Introduce la contraseña de administración para continuar.</p>
+        <label for="pass-login-admin" th:text="#{admin.login.password}">Contraseña</label>
+        <input id="pass-login-admin" type="password" name="pass-login-admin" required autocomplete="current-password">
+        <button type="submit" th:text="#{admin.login.submit}">Entrar</button>
+    </form>
+</main>
+</body>
+</html>

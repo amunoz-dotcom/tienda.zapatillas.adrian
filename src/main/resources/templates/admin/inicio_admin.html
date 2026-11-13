@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{admin.brand}">Administración</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div th:insert="~{fragments/general.html :: menu}"></div>
+<main class="admin-page">
+    <h1 class="admin-page__title" th:text="#{admin.dashboard}">Bienvenido a la administración de la tienda</h1>
+    <div class="admin-page__details-grid">
+        <a class="admin-page__button" th:href="@{/admin/gestionarZapatillas}" th:text="#{admin.products}">Zapatillas</a>
+        <a class="admin-page__button" th:href="@{/admin/gestionarUsuarios}" th:text="#{admin.users}">Usuarios</a>
+        <a class="admin-page__button" th:href="@{/admin/gestionarCategorias}" th:text="#{admin.categories}">Categorías</a>
+        <a class="admin-page__button" th:href="@{/admin/gestionarPedidos}" th:text="#{admin.orders}">Pedidos</a>
+    </div>
+</main>
+</body>
+</html>

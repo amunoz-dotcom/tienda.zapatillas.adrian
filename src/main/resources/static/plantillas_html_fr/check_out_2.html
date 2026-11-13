@@ -1,0 +1,25 @@
+<form id="checkout-form" class="checkout-form">
+    <h2 class="checkout-title">Informations de paiement</h2>
+    <p class="checkout-intro">Paiement de démonstration : aucun débit ne sera effectué.</p>
+    <div class="checkout-fields">
+        <label for="tipo_tarjeta">Type de carte</label>
+        <select id="tipo_tarjeta" name="tipoTarjeta" required>
+            <option value="" selected disabled>Choisir une carte</option>
+            <option value="visa">VISA</option>
+            <option value="master_card">Mastercard</option>
+        </select>
+        <label for="numero_tarjeta">Numéro de carte</label>
+        <input type="text" id="numero_tarjeta" name="numero" inputmode="numeric" autocomplete="cc-number"
+               placeholder="0000 0000 0000 0000" maxlength="23" pattern="[0-9 -]{12,23}" required>
+        <label for="titular_tarjeta">Nom du titulaire</label>
+        <input type="text" id="titular_tarjeta" name="titular" autocomplete="cc-name" maxlength="100" required>
+        <label for="fecha_caducidad">Date d’expiration (MM/AA)</label>
+        <input type="text" id="fecha_caducidad" name="fechaCaducidad" inputmode="numeric"
+               autocomplete="cc-exp" placeholder="MM/AA" maxlength="5" pattern="(0[1-9]|1[0-2])/[0-9]{2}" required>
+    </div>
+    <p class="checkout-error" role="alert" hidden></p>
+    <div class="checkout-actions">
+        <button type="button" class="checkout-button checkout-button--secondary" id="checkout-back-shipping">Retour à la livraison</button>
+        <button type="submit" class="checkout-button" id="aceptar_paso_2">Continuer</button>
+    </div>
+</form>

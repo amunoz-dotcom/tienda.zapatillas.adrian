@@ -1,0 +1,35 @@
+<div style="text-align: center; font-weight: bold; margin-bottom: 15px;">Carrito de la compra:</div>
+
+<!-- Envoltorio de la rejilla (Grid) -->
+<div class="product-grid">
+
+  {{#.}}
+  <!-- Tarjeta cuadrada individual por cada producto del carrito -->
+  <div class="product-card">
+    <strong>MODELO: {{MODELO}}</strong>
+
+    <!-- Imagen del producto en el carrito -->
+    <img class="imagen-producto" src="mostrar_miniatura?id={{ZAPATILLA_ID}}" alt="{{MODELO}}" loading="lazy" />
+
+    <div>PRECIO: {{PRECIO}} &euro;</div>
+
+    <div style="margin-top: 6px;">
+      <label>CANTIDAD:</label>
+      <!-- Actualiza la cantidad al cambiar el número -->
+      <input class="border" type="number" value="{{CANTIDAD}}" min="1"
+             onchange="actualizarCantidadCarrito({{ZAPATILLA_ID}}, this.value)" />
+    </div>
+
+    <div style="margin-top: 10px;">
+      <!-- Elimina el producto del carrito -->
+      <a href="#" class="btn-details" style="background-color: #dc3545; color: white;"
+         onclick="borrarProductoCarrito({{ZAPATILLA_ID}}); return false;">BORRAR PRODUCTO</a>
+    </div>
+  </div>
+  {{/.}}
+
+</div>
+
+<div style="text-align: center; font-size: 1.5em; padding: 20px;">
+  <a class="bg-blue-200 p-2" href="#" id="realizar_pedido">REALIZAR PEDIDO</a>
+</div>

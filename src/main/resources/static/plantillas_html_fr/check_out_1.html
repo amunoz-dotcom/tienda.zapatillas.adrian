@@ -1,0 +1,23 @@
+<form id="checkout-form" class="checkout-form">
+    <h2 class="checkout-title">Coordonnées de livraison</h2>
+    <p class="checkout-intro">Où souhaitez-vous recevoir votre commande ?</p>
+    <div class="checkout-fields">
+        <label for="campo_nombre">Nom complet</label>
+        <input type="text" id="campo_nombre" name="nombreCompleto" autocomplete="name" maxlength="100" required>
+        <label for="campo_direccion">Adresse</label>
+        <input type="text" id="campo_direccion" name="direccion" autocomplete="street-address" maxlength="160" required>
+        <label for="campo_poblacion">Ville</label>
+        <input type="text" id="campo_poblacion" name="poblacion" autocomplete="address-level2" maxlength="100" required>
+        <label for="campo_provincia">Région / province</label>
+        <input type="text" id="campo_provincia" name="provincia" autocomplete="address-level1" maxlength="100" required>
+        <label for="campo_codigo_postal">Code postal</label>
+        <input type="text" id="campo_codigo_postal" name="codigoPostal" autocomplete="postal-code" maxlength="16" required>
+        <label for="campo_telefono">Téléphone de contact</label>
+        <input type="tel" id="campo_telefono" name="telefono" autocomplete="tel" maxlength="25" required>
+    </div>
+    <p class="checkout-error" role="alert" hidden></p>
+    <div class="checkout-actions">
+        <button type="button" class="checkout-button checkout-button--secondary" id="checkout-cancel">Retour au panier</button>
+        <button type="submit" class="checkout-button" id="aceptar_paso_1">Continuer vers le paiement</button>
+    </div>
+</form>

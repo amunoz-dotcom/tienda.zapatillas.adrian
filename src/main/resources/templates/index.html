@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="es" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${#locale.language == 'en' ? 'Online Store' : (#locale.language == 'fr' ? 'Boutique en ligne' : 'Tienda Online')}">Tienda Online</title>
+    <link rel="stylesheet" href="css/estilos2.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- Librerías Three.js para la carga de modelos 3D (.FBX) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fflate@0.7.4/umd/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FBXLoader.js"></script>
+
+    <style>
+        .imagen-producto {
+            height: 140px;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        .imagen-producto:hover {
+            transform: scale(1.15);
+        }
+
+        /* Estilos del Banner Hero 3D */
+        .hero-3d-card {
+            position: relative;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 1000px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            color: #ffffff;
+            font-family: system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+        }
+
+        .hero-info {
+            flex: 1 1 320px;
+            z-index: 10;
+        }
+
+        .hero-badge {
+            background-color: #2563eb;
+            color: #bfdbfe;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 15px 0 10px 0;
+            line-height: 1.2;
+        }
+
+        .hero-text {
+            color: #dbeafe;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .hero-btn {
+            display: inline-block;
+            background-color: #fde047;
+            color: #1e3a8a;
+            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .hero-btn:hover {
+            background-color: #facc15;
+            transform: translateY(-2px);
+        }
+
+        /* Contenedor del Visor 3D */
+        .viewer-container {
+            position: relative;
+            flex: 1 1 420px;
+            height: 350px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Texto "AF1" Tipográfico detrás del modelo 3D */
+        .af1-bg-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 13rem;
+            font-weight: 900;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            color: rgba(255, 255, 255, 0.08);
+            letter-spacing: -4px;
+            user-select: none;
+            pointer-events: none;
+            z-index: 1;
+            text-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
+            line-height: 1;
+        }
+
+        #canvas-3d {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            cursor: grab;
+        }
+
+        #canvas-3d:active {
+            cursor: grabbing;
+        }
+
+        @media (max-width: 768px) {
+            .hero-3d-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            .viewer-container {
+                width: 100%;
+                height: 280px;
+            }
+            .af1-bg-text {
+                font-size: 9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="store-language-bar" th:aria-label="${#locale.language == 'en' ? 'Language' : (#locale.language == 'fr' ? 'Langue' : 'Idioma')}">
+    <a href="/?idioma=es" th:attr="aria-current=${#locale.language == 'es' ? 'true' : null}">Español</a>
+    <a href="/?idioma=en" th:attr="aria-current=${#locale.language == 'en' ? 'true' : null}">English</a>
+    <a href="/?idioma=fr" th:attr="aria-current=${#locale.language == 'fr' ? 'true' : null}">Français</a>
+</div>
+<a class="underline p-2 block" href="admin/inicioAdmin" th:text="${#locale.language == 'en' ? 'Administration' : (#locale.language == 'fr' ? 'Administration' : 'Acceso a administración')}">Acceso a administración</a>
+
+<section class="store-hero">
+    <h1 class="store-hero__title" th:text="${#locale.language == 'en' ? 'Find your next pair' : (#locale.language == 'fr' ? 'Trouvez votre prochaine paire' : 'Encuentra tu próximo par')}">Encuentra tu próximo par</h1>
+    <div class="store-carousel" role="region" aria-roledescription="carousel"
+         th:aria-label="${#locale.language == 'en' ? 'Featured sneakers' : (#locale.language == 'fr' ? 'Baskets à la une' : 'Zapatillas destacadas')}">
+        <div class="store-carousel__slides">
+            <div class="store-carousel__slide is-active" aria-hidden="false">
+                <img src="imagenes_productos_iniciales/Sneaker-Red.jpg" th:alt="${#locale.language == 'en' ? 'Red running sneakers' : (#locale.language == 'fr' ? 'Baskets de running rouges' : 'Zapatillas deportivas rojas')}" alt="Zapatillas deportivas rojas">
+            </div>
+            <div class="store-carousel__slide" aria-hidden="true">
+                <img src="imagenes_productos_iniciales/Sneaker-White.jpg" th:alt="${#locale.language == 'en' ? 'White sneakers with orange details' : (#locale.language == 'fr' ? 'Baskets blanches avec détails orange' : 'Zapatillas blancas con detalles naranjas')}" alt="Zapatillas blancas con detalles naranjas">
+            </div>
+            <div class="store-carousel__slide" aria-hidden="true">
+                <img src="imagenes_productos_iniciales/Sneaker-Classic.jpg" th:alt="${#locale.language == 'en' ? 'Classic white leather sneakers' : (#locale.language == 'fr' ? 'Baskets classiques en cuir blanc' : 'Zapatillas clásicas de piel blanca')}" alt="Zapatillas clásicas de piel blanca">
+            </div>
+        </div>
+        <button class="store-carousel__arrow store-carousel__arrow--previous" type="button"
+                th:aria-label="${#locale.language == 'en' ? 'Previous image' : (#locale.language == 'fr' ? 'Image précédente' : 'Imagen anterior')}">‹</button>
+        <button class="store-carousel__arrow store-carousel__arrow--next" type="button"
+                th:aria-label="${#locale.language == 'en' ? 'Next image' : (#locale.language == 'fr' ? 'Image suivante' : 'Imagen siguiente')}">›</button>
+        <div class="store-carousel__indicators">
+            <button type="button" th:aria-label="${#locale.language == 'en' ? 'Show image 1' : (#locale.language == 'fr' ? 'Afficher l’image 1' : 'Mostrar imagen 1')}" aria-label="Mostrar imagen 1" aria-current="true"></button>
+            <button type="button" th:aria-label="${#locale.language == 'en' ? 'Show image 2' : (#locale.language == 'fr' ? 'Afficher l’image 2' : 'Mostrar imagen 2')}" aria-label="Mostrar imagen 2"></button>
+            <button type="button" th:aria-label="${#locale.language == 'en' ? 'Show image 3' : (#locale.language == 'fr' ? 'Afficher l’image 3' : 'Mostrar imagen 3')}" aria-label="Mostrar imagen 3"></button>
+            <button type="button" th:aria-label="${#locale.language == 'en' ? 'Show image 8' : (#locale.language == 'fr' ? 'Afficher l’image 8' : 'Mostrar imagen 8')}" aria-label="Mostrar imagen 8"></button>
+        </div>
+    </div>
+    <p class="store-hero__caption" th:text="${#locale.language == 'en' ? 'Style, comfort and performance for every step.' : (#locale.language == 'fr' ? 'Style, confort et performance à chaque pas.' : 'Estilo, comodidad y rendimiento en cada paso.')}">Estilo, comodidad y rendimiento en cada paso.</p>
+</section>
+<nav class="store-nav" th:aria-label="${#locale.language == 'en' ? 'Store navigation' : (#locale.language == 'fr' ? 'Navigation de la boutique' : 'Navegación de la tienda')}">
+    <div id="usuarioActual">
+    <span th:if="${#locale.language == 'es'}">Usuario no identificado</span>
+    <span th:if="${#locale.language == 'en'}">Guest</span>
+    <span th:if="${#locale.language == 'fr'}">Visiteur</span>
+</div>
+    <a href="#" id="zapatillas" th:text="${#locale.language == 'en' ? 'SNEAKERS' : (#locale.language == 'fr' ? 'BASKETS' : 'ZAPATILLAS')}">ZAPATILLAS</a>
+    <a href="#" id="registrarme" class="enlace-registrarme" th:text="${#locale.language == 'en' ? 'SIGN UP' : (#locale.language == 'fr' ? 'S’INSCRIRE' : 'REGISTRARME')}">REGISTRARME</a>
+    <a href="#" id="identificarme" class="enlace-identificarme" th:text="${#locale.language == 'en' ? 'LOG IN' : (#locale.language == 'fr' ? 'SE CONNECTER' : 'IDENTIFICARME')}">IDENTIFICARME</a>
+    <a href="#" style="display: none;" id="carrito" class="enlace-carrito" th:text="${#locale.language == 'en' ? 'CART' : (#locale.language == 'fr' ? 'PANIER' : 'CARRITO')}">CARRITO</a>
+    <a href="#" style="display: none;" id="pedidos" class="enlace-pedidos" th:text="${#locale.language == 'en' ? 'MY ORDERS' : (#locale.language == 'fr' ? 'MES COMMANDES' : 'VER MIS PEDIDOS')}">VER MIS PEDIDOS</a>
+    <a href="#" style="display: none;" id="mis_datos" class="enlace-mis_datos" th:text="${#locale.language == 'en' ? 'MY DETAILS' : (#locale.language == 'fr' ? 'MES INFORMATIONS' : 'MIS DATOS')}">MIS DATOS</a>
+    <a href="#" style="display: none;" id="cerrar_sesion" class="enlace-cerrar_sesion" th:text="${#locale.language == 'en' ? 'LOG OUT' : (#locale.language == 'fr' ? 'SE DÉCONNECTER' : 'CERRAR SESIÓN')}">CERRAR SESIÓN</a>
+</nav>
+
+<div id="contenedor"></div>
+
+<script src="librerias_js/jquery.js"></script>
+<script src="librerias_js/mustache.js"></script>
+
+<script>
+
+    var idiomaActual = ["en", "fr"].includes(document.documentElement.lang) ? document.documentElement.lang : "es";
+    var rutaPlantillas = "plantillas_html_" + idiomaActual + "/";
+    var textos = idiomaActual === "fr" ? {
+        identifyFirst: "Veuillez d'abord vous connecter.", invalidQuantity: "Veuillez saisir une quantité valide.",
+        searchProducts: "Rechercher des baskets", searchButton: "Rechercher", results: "Résultats",
+        previous: "Précédent", next: "Suivant", noProducts: "Aucun produit trouvé.",
+        logoutError: "Impossible de fermer la session.",
+        cartEmpty: "Votre panier est vide.", deleteConfirm: "Voulez-vous vraiment retirer cet article du panier ?",
+        invalidProduct: "Identifiant de produit invalide.", deleteError: "Impossible de supprimer l'article du panier.",
+        minQuantity: "La quantité doit être au moins égale à 1.", updateError: "Impossible de modifier la quantité.",
+        welcome: "Bienvenue, ", loginSuccess: "Connexion réussie. Vous pouvez maintenant ajouter des articles au panier.",
+        orderError: "Impossible de traiter la commande.", reviewTitle: "Vérifiez votre commande",
+        shipping: "Livraison", payment: "Paiement", preferences: "Préférences", products: "Articles",
+        quantity: "Quantité", total: "Total", confirmOrder: "Confirmer la commande",
+        demoPayment: "Paiement de démonstration : aucun débit ne sera effectué.",
+        orderComplete: "Votre commande a été confirmée.", orderFailed: "La commande n'a pas pu être confirmée.",
+        checkoutProgress: "Étapes de commande", backToCart: "Retour au panier",
+        continueShopping: "Continuer vos achats", cardNumberInvalid: "Vérifiez le numéro de carte.",
+        shippingAddress: "Adresse de livraison", paymentMethod: "Moyen de paiement",
+        orderPreferences: "Options de la commande", editShipping: "Modifier la livraison",
+        editPayment: "Modifier le paiement", editPreferences: "Modifier les préférences",
+        subtotal: "Sous-total", cartTotal: "Total du panier", processing: "Traitement en cours…",
+        cartLoadError: "Impossible de charger le panier.",
+        myOrdersTitle: "Mes commandes", ordersEmpty: "Vous n'avez pas encore de commande.",
+        ordersLoadError: "Impossible de charger vos commandes.", orderNumber: "Commande",
+        orderStatus: "Statut", orderedProducts: "Articles", orderedQuantity: "Articles au total",
+        backToProducts: "Retour aux baskets",
+        profileTitle: "Mes informations", profileName: "Nom complet", profileEmail: "Adresse e-mail",
+        profileAddress: "Adresse", profileNewPassword: "Nouveau mot de passe (facultatif)",
+        profileAvatar: "Photo de profil (PNG ou JPEG, 2 Mo maximum)",
+        profileSave: "Enregistrer les modifications", profileSaved: "Vos informations ont été enregistrées.",
+        profileLoadError: "Impossible de charger vos informations.",
+        profileBack: "Retour aux baskets", profileAvatarAlt: "Photo de profil"
+    } : idiomaActual === "en" ? {
+        identifyFirst: "Please log in first.", invalidQuantity: "Enter a valid quantity.",
+        searchProducts: "Search sneakers", searchButton: "Search", results: "Results",
+        previous: "Previous", next: "Next", noProducts: "No products found.",
+        logoutError: "Could not log out.",
+        cartEmpty: "Your cart is empty.", deleteConfirm: "Are you sure you want to remove this item from your cart?",
+        invalidProduct: "Invalid product ID.", deleteError: "Could not remove the item from the cart.",
+        minQuantity: "Quantity must be at least 1.", updateError: "Could not update the quantity.",
+        welcome: "Welcome, ", loginSuccess: "Logged in successfully. You can now add products to your cart.",
+        orderError: "Could not process the order.", reviewTitle: "Review your order",
+        shipping: "Shipping", payment: "Payment", preferences: "Preferences", products: "Products",
+        quantity: "Quantity", total: "Total", confirmOrder: "Confirm order",
+        demoPayment: "Demo payment: no charge will be made.",
+        orderComplete: "Your order has been confirmed.", orderFailed: "Could not confirm the order.",
+        checkoutProgress: "Checkout steps", backToCart: "Back to cart",
+        continueShopping: "Continue shopping", cardNumberInvalid: "Check the card number.",
+        shippingAddress: "Shipping address", paymentMethod: "Payment method",
+        orderPreferences: "Order preferences", editShipping: "Edit shipping",
+        editPayment: "Edit payment", editPreferences: "Edit preferences",
+        subtotal: "Subtotal", cartTotal: "Cart total", processing: "Processing…",
+        cartLoadError: "Could not load the cart.",
+        myOrdersTitle: "My orders", ordersEmpty: "You don't have any orders yet.",
+        ordersLoadError: "Could not load your orders.", orderNumber: "Order",
+        orderStatus: "Status", orderedProducts: "Items", orderedQuantity: "Total items",
+        backToProducts: "Back to sneakers",
+        profileTitle: "My details", profileName: "Full name", profileEmail: "Email address",
+        profileAddress: "Address", profileNewPassword: "New password (optional)",
+        profileAvatar: "Profile picture (PNG or JPEG, max 2 MB)",
+        profileSave: "Save changes", profileSaved: "Your details have been saved.",
+        profileLoadError: "Could not load your details.",
+        profileBack: "Back to sneakers", profileAvatarAlt: "Profile picture"
+    } : {
+        identifyFirst: "Identifícate primero.", invalidQuantity: "Indica una cantidad válida.",
+        searchProducts: "Buscar zapatillas", searchButton: "Buscar", results: "Resultados",
+        previous: "Anterior", next: "Siguiente", noProducts: "No se encontraron productos.",
+        logoutError: "No se pudo cerrar la sesión.",
+        cartEmpty: "Tu carrito está vacío.", deleteConfirm: "¿Seguro que deseas eliminar este producto del carrito?",
+        invalidProduct: "Error: ID de producto no válido.", deleteError: "Error al borrar el producto del carrito.",
+        minQuantity: "La cantidad debe ser como mínimo 1.", updateError: "Error al actualizar la cantidad.",
+        welcome: "Bienvenido ", loginSuccess: "Identificado correctamente, ya puedes agregar productos al carrito.",
+        orderError: "No se pudo procesar el pedido.", reviewTitle: "Revisa tu pedido",
+        shipping: "Envío", payment: "Pago", preferences: "Preferencias", products: "Productos",
+        quantity: "Cantidad", total: "Total", confirmOrder: "Confirmar pedido",
+        demoPayment: "Pago de demostración: no se realizará ningún cargo.",
+        orderComplete: "Tu pedido se ha confirmado correctamente.", orderFailed: "No se pudo confirmar el pedido.",
+        checkoutProgress: "Pasos de compra", backToCart: "Volver al carrito",
+        continueShopping: "Seguir comprando", cardNumberInvalid: "Revisa el número de la tarjeta.",
+        shippingAddress: "Dirección de envío", paymentMethod: "Método de pago",
+        orderPreferences: "Preferencias del pedido", editShipping: "Editar envío",
+        editPayment: "Editar pago", editPreferences: "Editar preferencias",
+        subtotal: "Subtotal", cartTotal: "Total del carrito", processing: "Procesando…",
+        cartLoadError: "No se pudo cargar el carrito.",
+        myOrdersTitle: "Mis pedidos", ordersEmpty: "Todavía no tienes pedidos.",
+        ordersLoadError: "No se pudieron cargar tus pedidos.", orderNumber: "Pedido",
+        orderStatus: "Estado", orderedProducts: "Productos", orderedQuantity: "Artículos en total",
+        backToProducts: "Volver a las zapatillas",
+        profileTitle: "Mis datos", profileName: "Nombre completo", profileEmail: "Correo electrónico",
+        profileAddress: "Dirección", profileNewPassword: "Nueva contraseña (opcional)",
+        profileAvatar: "Foto de perfil (PNG o JPEG, máximo 2 MB)",
+        profileSave: "Guardar cambios", profileSaved: "Tus datos se han guardado.",
+        profileLoadError: "No se pudieron cargar tus datos.",
+        profileBack: "Volver a las zapatillas", profileAvatarAlt: "Foto de perfil"
+    };
+
+    (function initializeHeroCarousel() {
+        var carousel = document.querySelector(".store-carousel");
+        if (!carousel) return;
+
+        var slides = Array.from(carousel.querySelectorAll(".store-carousel__slide"));
+        var indicators = Array.from(carousel.querySelectorAll(".store-carousel__indicators button"));
+        var currentSlide = 0;
+        var timer;
+
+        function showSlide(index) {
+            slides[currentSlide].classList.remove("is-active");
+            slides[currentSlide].setAttribute("aria-hidden", "true");
+            indicators[currentSlide].removeAttribute("aria-current");
+            currentSlide = (index + slides.length) % slides.length;
+            slides[currentSlide].classList.add("is-active");
+            slides[currentSlide].setAttribute("aria-hidden", "false");
+            indicators[currentSlide].setAttribute("aria-current", "true");
+        }
+
+        function restartTimer() {
+            window.clearInterval(timer);
+            if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                timer = window.setInterval(function() {
+                    showSlide(currentSlide + 1);
+                }, 5000);
+            }
+        }
+
+        carousel.querySelector(".store-carousel__arrow--previous").addEventListener("click", function() {
+            showSlide(currentSlide - 1);
+            restartTimer();
+        });
+        carousel.querySelector(".store-carousel__arrow--next").addEventListener("click", function() {
+            showSlide(currentSlide + 1);
+            restartTimer();
+        });
+        indicators.forEach(function(indicator, index) {
+            indicator.addEventListener("click", function() {
+                showSlide(index);
+                restartTimer();
+            });
+        });
+        carousel.addEventListener("mouseenter", function() { window.clearInterval(timer); });
+        carousel.addEventListener("mouseleave", restartTimer);
+        carousel.addEventListener("focusin", function() { window.clearInterval(timer); });
+        carousel.addEventListener("focusout", function(event) {
+            if (!carousel.contains(event.relatedTarget)) restartTimer();
+        });
+        restartTimer();
+    })();
+
+    nombre_login = ""; // variable que indica el nombre del usuario si se ha identificado
+    var paginaZapatillas = 0;
+    var busquedaZapatillas = "";
+    var temporizadorBusqueda = null;
+    var peticionZapatillas = null;
+
+    // Variables globales para almacenar las plantillas
+    var plantilla_inicio,
+        plantilla_productos,
+        plantilla_detalles_producto,
+        plantilla_registro_usuario,
+        plantilla_login_usuario,
+        plantilla_carrito;
+
+    // Esperamos a que TODAS las plantillas se carguen mediante peticiones asíncronas
+    $.when(
+        $.get(rutaPlantillas + "inicio.html", function(res){ plantilla_inicio = res; }),
+        $.get(rutaPlantillas + "listado_productos.html", function(res){ plantilla_productos = res; }),
+        $.get(rutaPlantillas + "detalles_producto.html", function(res){ plantilla_detalles_producto = res; }),
+        $.get(rutaPlantillas + "registro_usuario.html", function(res){ plantilla_registro_usuario = res; }),
+        $.get(rutaPlantillas + "indentificar_usuario.html", function(res){ plantilla_login_usuario = res; }),
+        $.get(rutaPlantillas + "carrito.html", function(res){ plantilla_carrito = res; }),
+        $.get(rutaPlantillas + "check_out_1.html", function(res){ plantilla_check_out_1 = res; }),
+        $.get(rutaPlantillas + "check_out_2.html", function(res){ plantilla_check_out_2 = res; }),
+        $.get(rutaPlantillas + "check_out_3.html", function(res){ plantilla_check_out_3 = res; })
+    ).then(function() {
+        // Una vez cargadas todas las plantillas, mostramos el listado por defecto
+        mostrar_zapatillas();
+        $.getJSON("restUsuarios/usuarioActual").done(function(usuario) {
+            mostrarUsuarioIdentificado(usuario.nombre);
+        }).fail(function(xhr) {
+            if (xhr.status !== 401) console.error("No se pudo comprobar la sesión del usuario.", xhr);
+        });
+    });
+
+    function mostrar_zapatillas() {
+        if (peticionZapatillas && peticionZapatillas.readyState !== 4) {
+            peticionZapatillas.abort();
+        }
+        peticionZapatillas = $.getJSON("restZapatillas/listar", {
+            busqueda: busquedaZapatillas,
+            pagina: paginaZapatillas,
+            tamano: 10
+        }).done(function(resultado) {
+            var buscadorEnFoco = $("#buscador-productos").is(":focus");
+            var posicionCursor = buscadorEnFoco ? $("#buscador-productos")[0].selectionStart : null;
+            var controles = $("<div>").addClass("m-3 store-controls");
+            var formulario = $("<form>").attr("id", "form-busqueda-productos").addClass("store-search-form");
+            var buscador = $("<input>").attr({
+                id: "buscador-productos",
+                type: "search",
+                placeholder: textos.searchProducts,
+                "aria-label": textos.searchProducts
+            }).addClass("border rounded p-2").val(busquedaZapatillas);
+            var botonBuscar = $("<button>").attr("type", "submit").text(textos.searchButton)
+                .addClass("border rounded px-3 py-2");
+            formulario.append(buscador, botonBuscar);
+            controles.append(formulario);
+            controles.append($("<span>").text(textos.results + ": " + resultado.total));
+
+            var navegacion = $("<nav>").attr("aria-label", idiomaActual === "fr" ? "Pagination des produits" : (idiomaActual === "en" ? "Product pagination" : "Paginación de productos"))
+                .addClass("store-pagination");
+            if (resultado.pagina > 0) {
+                navegacion.append($("<button>").attr("type", "button").attr("id", "pagina-anterior")
+                    .text(textos.previous).addClass("border rounded px-3 py-2"));
+            }
+            if (resultado.totalPaginas > 1) {
+                navegacion.append($("<span>").text((resultado.pagina + 1) + " / " + resultado.totalPaginas)
+                    .addClass("self-center"));
+            }
+            if (resultado.pagina + 1 < resultado.totalPaginas) {
+                navegacion.append($("<button>").attr("type", "button").attr("id", "pagina-siguiente")
+                    .text(textos.next).addClass("border rounded px-3 py-2"));
+            }
+            controles.append(navegacion);
+
+            var productos = Mustache.render(plantilla_productos, resultado.zapatillas);
+            $("#contenedor").empty().append(controles).append(productos);
+            if (resultado.zapatillas.length === 0) {
+                $("#contenedor").append($("<p>").addClass("m-3").text(textos.noProducts));
+            }
+            paginaZapatillas = resultado.pagina;
+
+            $("#form-busqueda-productos").on("submit", function(event) {
+                event.preventDefault();
+                busquedaZapatillas = $("#buscador-productos").val();
+                paginaZapatillas = 0;
+                mostrar_zapatillas();
+            });
+            $("#buscador-productos").on("input", function() {
+                busquedaZapatillas = $(this).val();
+                paginaZapatillas = 0;
+                clearTimeout(temporizadorBusqueda);
+                temporizadorBusqueda = setTimeout(mostrar_zapatillas, 300);
+            });
+            $("#pagina-anterior").on("click", function() {
+                paginaZapatillas--;
+                mostrar_zapatillas();
+            });
+            $("#pagina-siguiente").on("click", function() {
+                paginaZapatillas++;
+                mostrar_zapatillas();
+            });
+            if (buscadorEnFoco) {
+                $("#buscador-productos").trigger("focus");
+                if (posicionCursor !== null) {
+                    $("#buscador-productos")[0].setSelectionRange(posicionCursor, posicionCursor);
+                }
+            }
+        });
+    }
+
+    function mostrar_detalles(id) {
+        $.getJSON("restZapatillas/obtener-zapatilla", { id : id }).done(
+            function(json){
+                var resultadoHtml = Mustache.render(plantilla_detalles_producto, json);
+                $("#contenedor").html(resultadoHtml);
+                $("#contenedor .product-detail-gallery__item").on("click", function() {
+                    var miniatura = $(this).find("img");
+                    $("#contenedor .product-detail-image__main")
+                        .attr("src", miniatura.data("full-image"));
+                });
+            }
+        );
+    }
+
+    $("#registrarme").click(mostrar_formulario_registro_usuario);
+
+    function mostrar_formulario_registro_usuario(){
+        $("#contenedor").html(plantilla_registro_usuario);
+        $("#form_registro_usuario").submit(
+            function(e){
+                e.preventDefault();
+                formulario = document.getElementById("form_registro_usuario");
+                formData = new FormData(formulario);
+                console.log("bien, ya tengo toda la informacion introducida:");
+                console.log(Object.fromEntries(formData));
+
+                $.ajax("restUsuarios/registrarUsuario",{
+                    type : "POST",
+                    data: formData,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (res){
+                        alert(res);
+                        confetti();
+                    }
+                });
+            }
+        );
+    }
+
+    $("#zapatillas").click(mostrar_zapatillas);
+
+    $("#identificarme").click(mostrar_login);
+    $("#pedidos").on("click", function(event) {
+        event.preventDefault();
+        mostrar_mis_pedidos();
+    });
+    $("#mis_datos").on("click", function(event) {
+        event.preventDefault();
+        mostrar_mis_datos();
+    });
+
+    $("#cerrar_sesion").click(function(event) {
+        event.preventDefault();
+        $.post("restUsuarios/cerrarSesion").done(function(respuesta) {
+            if (respuesta === "ok") {
+                location.reload();
+            }
+        }).fail(function(xhr) {
+            alert(xhr.responseText || textos.logoutError);
+        });
+    });
+
+    function mostrar_login(){
+        $("#contenedor").html(plantilla_login_usuario);
+        $("#form_login").submit(
+            function (e){
+                e.preventDefault();
+                $.post("restUsuarios/identificarUsuario",
+                    {
+                        email: $("#email").val(),
+                        pass: $("#pass").val()
+                    }
+                ).done(function (res){
+                    if(res == "email o pass incorrectos"){
+                        alert(res);
+                        return;
+                    }
+                    nombre_login = res.substring(res.indexOf(",") + 1);
+                    alert(textos.loginSuccess);
+                    mostrar_zapatillas();
+                    mostrarUsuarioIdentificado(nombre_login);
+                });
+            }
+        );
+    }
+
+    function mostrarUsuarioIdentificado(nombre) {
+        nombre_login = nombre;
+        $("#usuarioActual").text(textos.welcome + nombre);
+        $(".enlace-registrarme, .enlace-identificarme").hide();
+        $(".enlace-carrito, .enlace-pedidos, .enlace-mis_datos, .enlace-cerrar_sesion").css("display", "flex");
+    }
+
+    function mostrar_mis_datos() {
+        $.getJSON("restUsuarios/usuarioActual").done(function(usuario) {
+            var formulario = $("<form>").addClass("profile-form").attr({
+                id: "form-mis-datos",
+                enctype: "multipart/form-data"
+            });
+            var tarjeta = $("<section>").addClass("profile-card")
+                .append($("<h2>").addClass("orders-title").text(textos.profileTitle));
+            var avatar = $("<img>").addClass("profile-avatar").attr({
+                src: "restUsuarios/avatar?v=" + Date.now(),
+                alt: textos.profileAvatarAlt
+            }).on("error", function() {
+                $(this).hide();
+                $("#avatar-fallback").show();
+            });
+            var avatarFallback = $("<div>").attr("id", "avatar-fallback")
+                .addClass("profile-avatar profile-avatar--fallback")
+                .text((usuario.nombre || "?").trim().charAt(0).toUpperCase()).hide();
+            var avatarInput = $("<input>").attr({
+                type: "file",
+                name: "avatar",
+                accept: "image/png,image/jpeg"
+            });
+            var avatarLabel = $("<label>").addClass("profile-field")
+                .append($("<span>").text(textos.profileAvatar), avatarInput);
+            var avatarSection = $("<div>").addClass("profile-avatar-section")
+                .append(avatar, avatarFallback, avatarLabel);
+            function campoPerfil(nombre, valor, type, requerido) {
+                var input = $("<input>").attr({type: type, name: nombre, required: requerido});
+                if (valor) input.val(valor);
+                var etiquetas = {
+                    nombre: textos.profileName,
+                    email: textos.profileEmail,
+                    direccion: textos.profileAddress,
+                    nuevaPass: textos.profileNewPassword
+                };
+                return $("<label>").addClass("profile-field")
+                    .append($("<span>").text(etiquetas[nombre]), input);
+            }
+            formulario.append(
+                campoPerfil("nombre", usuario.nombre, "text", true),
+                campoPerfil("email", usuario.email, "email", true),
+                campoPerfil("direccion", usuario.direccion, "text", true),
+                campoPerfil("nuevaPass", "", "password", false).find("input")
+                    .attr("autocomplete", "new-password").end(),
+                avatarSection
+            );
+            var mensaje = $("<p>").addClass("profile-message").attr({role: "status", hidden: true});
+            var error = $("<p>").addClass("checkout-error").attr({role: "alert", hidden: true});
+            var guardar = $("<button>").attr("type", "submit").addClass("checkout-button")
+                .text(textos.profileSave);
+            var volver = $("<button>").attr("type", "button")
+                .addClass("checkout-button checkout-button--secondary")
+                .text(textos.profileBack).on("click", mostrar_zapatillas);
+            formulario.append(error, mensaje, $("<div>").addClass("checkout-actions").append(guardar, volver));
+            tarjeta.append(formulario);
+            $("#contenedor").empty().append(tarjeta);
+
+            avatarInput.on("change", function() {
+                var archivo = this.files && this.files[0];
+                if (!archivo) return;
+                if (!["image/png", "image/jpeg"].includes(archivo.type) || archivo.size > 2 * 1024 * 1024) {
+                    this.value = "";
+                    error.text(textos.profileAvatar).prop("hidden", false);
+                    return;
+                }
+                var lector = new FileReader();
+                lector.onload = function(event) {
+                    avatar.attr("src", event.target.result).show();
+                    avatarFallback.hide();
+                };
+                lector.readAsDataURL(archivo);
+            });
+            formulario.on("submit", function(event) {
+                event.preventDefault();
+                if (!this.reportValidity()) return;
+                var boton = formulario.find("button[type=submit]");
+                boton.prop("disabled", true);
+                $.ajax({
+                    url: "restUsuarios/mis-datos",
+                    type: "POST",
+                    data: new FormData(this),
+                    processData: false,
+                    contentType: false
+                }).done(function(resultado) {
+                    mostrarUsuarioIdentificado(resultado.nombre);
+                    avatar.attr("src", "restUsuarios/avatar?v=" + Date.now());
+                    formulario.find("[name=nuevaPass]").val("");
+                    error.prop("hidden", true);
+                    mensaje.text(textos.profileSaved).prop("hidden", false);
+                }).fail(function(xhr) {
+                    error.text(xhr.responseText || textos.profileLoadError).prop("hidden", false);
+                }).always(function() {
+                    boton.prop("disabled", false);
+                });
+            });
+        }).fail(function(xhr) {
+            $("#contenedor").empty().append($("<p>").addClass("checkout-error").attr("role", "alert")
+                .text(xhr.status === 401 ? textos.identifyFirst : textos.profileLoadError));
+        });
+    }
+
+    function mostrar_mis_pedidos() {
+        var contenido = $("<section>").addClass("orders-page")
+            .append($("<h2>").addClass("orders-title").text(textos.myOrdersTitle))
+            .append($("<p>").text(idiomaActual === "fr" ? "Chargement…" : (idiomaActual === "en" ? "Loading…" : "Cargando…")));
+        $("#contenedor").empty().append(contenido);
+        $.getJSON("restPedidos/mis-pedidos").done(function(pedidos) {
+            contenido.empty().append($("<h2>").addClass("orders-title").text(textos.myOrdersTitle));
+            if (!pedidos.length) {
+                contenido.append($("<p>").addClass("orders-empty").text(textos.ordersEmpty));
+            } else {
+                pedidos.forEach(function(pedido) {
+                    var estado = pedido.estado;
+                    if (estado === "Completado") estado = idiomaActual === "en" ? "Completed" : (idiomaActual === "fr" ? "Terminée" : "Completado");
+                    if (estado === "Enviado") estado = idiomaActual === "en" ? "Shipped" : (idiomaActual === "fr" ? "Expédiée" : "Enviado");
+                    if (estado === "Incidencia") estado = idiomaActual === "en" ? "Issue" : (idiomaActual === "fr" ? "Incident" : "Incidencia");
+                    var tarjeta = $("<article>").addClass("order-card");
+                    tarjeta.append($("<div>").addClass("order-card__heading")
+                        .append($("<h3>").text(textos.orderNumber + " #" + pedido.id))
+                        .append($("<span>").addClass("order-status").text(textos.orderStatus + ": " + estado)));
+                    var productos = $("<ul>").addClass("order-products");
+                    pedido.productos.forEach(function(producto) {
+                        var detalle = $("<div>").addClass("order-product__details")
+                            .append($("<strong>").text(producto.modelo))
+                            .append($("<span>").text(producto.marca + " · " +
+                                (idiomaActual === "fr" ? "Pointure" : (idiomaActual === "en" ? "Size" : "Talla")) +
+                                " " + producto.talla))
+                            .append($("<span>").text(textos.quantity + ": " + producto.cantidad));
+                        productos.append($("<li>").addClass("order-product")
+                            .append($("<img>").attr({
+                                src: "mostrar_miniatura?id=" + encodeURIComponent(producto.zapatillaId),
+                                alt: producto.modelo,
+                                loading: "lazy"
+                            }))
+                            .append(detalle));
+                    });
+                    tarjeta.append($("<h4>").text(textos.orderedProducts), productos);
+                    tarjeta.append($("<p>").addClass("order-card__quantity")
+                        .text(textos.orderedQuantity + ": " + pedido.totalUnidades));
+                    contenido.append(tarjeta);
+                });
+            }
+            contenido.append($("<button>").attr("type", "button").addClass("checkout-button")
+                .text(textos.backToProducts).on("click", mostrar_zapatillas));
+        }).fail(function(xhr) {
+            contenido.empty().append($("<h2>").addClass("orders-title").text(textos.myOrdersTitle))
+                .append($("<p>").addClass("checkout-error").attr("role", "alert")
+                    .text(xhr.status === 401 ? textos.identifyFirst : (xhr.responseText || textos.ordersLoadError)))
+                .append($("<button>").attr("type", "button").addClass("checkout-button")
+                    .text(textos.backToProducts).on("click", mostrar_zapatillas));
+        });
+    }
+
+    function agregarProductoCarrito(idProducto, cantidad){
+        if ( nombre_login == "" ){
+            alert(textos.identifyFirst);
+            return;
+        }
+        if (!Number.isInteger(Number(cantidad)) || Number(cantidad) < 1) {
+            alert(textos.invalidQuantity);
+            return;
+        }
+        $.post("restCarrito/agregarProducto",{
+            id: idProducto,
+            cantidad: cantidad
+        }).done(function(res){
+            alert(res);
+        }).fail(function(xhr){
+            alert(xhr.responseText || "No se pudo agregar el producto al carrito.");
+        });
+    }
+
+    function mostrar_productos_carrito() {
+        $.getJSON("restCarrito/obtenerProductos").done(
+            function(res) {
+                if (!res || res.length === 0) {
+                    var carritoVacio = $("<section>").addClass("cart-empty").attr("role", "status");
+                    carritoVacio.append($("<p>").text("🛒 " + textos.cartEmpty));
+                    carritoVacio.append($("<button>").attr("type", "button").addClass("checkout-button")
+                        .text(textos.continueShopping).on("click", mostrar_zapatillas));
+                    $("#contenedor").empty().append(carritoVacio);
+                    return;
+                }
+
+                var html = Mustache.render(plantilla_carrito, res);
+                var total = res.reduce(function(suma, producto) {
+                    return suma + (Number(producto.PRECIO) || 0) * (Number(producto.CANTIDAD) || 0);
+                }, 0);
+                var resumen = $("<div>").addClass("cart-summary");
+                resumen.append($("<strong>").text(textos.cartTotal + ": " + formatearPrecio(total)));
+                $("#contenedor").empty().append(html);
+                $("#contenedor .product-grid").after(resumen);
+                $("#seguir_comprando").on("click", mostrar_zapatillas);
+                $(".cart-quantity").on("change", function() {
+                    actualizarCantidadCarrito($(this).data("product-id"), this.value);
+                });
+                $(".cart-remove").on("click", function() {
+                    borrarProductoCarrito($(this).data("product-id"));
+                });
+                $("#realizar_pedido").click(function(){
+                    if (nombre_login === "") {
+                        alert(textos.identifyFirst);
+                        return;
+                    }
+                    checkoutDraft = {};
+                    mostrar_check_out_paso_1();
+                });
+            }
+        ).fail(function() {
+            $("#contenedor").empty().append($("<p>").addClass("checkout-error").attr("role", "alert")
+                .text(textos.cartLoadError));
+        });
+    }
+
+    $("#carrito").click(mostrar_productos_carrito);
+
+    function borrarProductoCarrito(idProducto) {
+        if (!idProducto) {
+            alert(textos.invalidProduct);
+            return;
+        }
+        if (confirm(textos.deleteConfirm)) {
+            $.post("restCarrito/borrarProducto", { id: idProducto })
+                .done(function(res) {
+                    mostrar_productos_carrito();
+                })
+                .fail(function(xhr) {
+                    alert(textos.deleteError);
+                });
+        }
+    }
+
+    function actualizarCantidadCarrito(idProducto, nuevaCantidad) {
+        if (!idProducto) return;
+        var cantidad = parseInt(nuevaCantidad);
+        if (isNaN(cantidad) || cantidad < 1) {
+            alert(textos.minQuantity);
+            mostrar_productos_carrito();
+            return;
+        }
+        $.post("restCarrito/actualizarCantidad", {
+            id: idProducto,
+            cantidad: cantidad
+        })
+            .done(function(res) {
+                mostrar_productos_carrito();
+            })
+            .fail(function(xhr) {
+                alert(textos.updateError);
+            });
+    }
+    var checkoutDraft = {};
+
+    function formatearPrecio(cantidad) {
+        return Number(cantidad).toLocaleString(idiomaActual, { style: "currency", currency: "EUR" });
+    }
+
+    function mostrar_paso_checkout(plantilla, paso) {
+        var pasos = [textos.shipping, textos.payment, textos.preferences, textos.reviewTitle];
+        var progreso = $("<ol>").addClass("checkout-progress").attr("aria-label", textos.checkoutProgress);
+        pasos.forEach(function(nombre, indice) {
+            var item = $("<li>").text(nombre);
+            if (indice + 1 === paso) item.attr("aria-current", "step");
+            else if (indice + 1 < paso) item.addClass("is-complete");
+            progreso.append(item);
+        });
+        var tarjeta = $("<section>").addClass("checkout-card").append(progreso).append($(plantilla));
+        $("#contenedor").empty().append(tarjeta);
+
+        var formulario = $("#checkout-form");
+        formulario.find(":input[name]").each(function() {
+            var valor = checkoutDraft[this.name];
+            if (valor !== undefined) $(this).val(valor);
+            $(this).on("input change", function() {
+                checkoutDraft[this.name] = $(this).val();
+            });
+        });
+        formulario.find(".checkout-error").prop("hidden", true);
+        $("#checkout-cancel").on("click", function() {
+            mostrar_productos_carrito();
+        });
+        $("#checkout-back-shipping").on("click", mostrar_check_out_paso_1);
+        $("#checkout-back-payment").on("click", mostrar_check_out_paso_2);
+        return formulario;
+    }
+
+    function enviar_paso_checkout(formulario, ruta, alCompletar) {
+        var boton = formulario.find('button[type="submit"]');
+        var error = formulario.find(".checkout-error");
+        error.prop("hidden", true).text("");
+        boton.prop("disabled", true);
+        formulario.find(":input[name]").each(function() {
+            checkoutDraft[this.name] = $(this).val();
+        });
+        $.post(ruta, formulario.serialize())
+            .done(alCompletar)
+            .fail(function(xhr) {
+                error.text(xhr.responseText || textos.orderError).prop("hidden", false);
+            })
+            .always(function() {
+                boton.prop("disabled", false);
+            });
+    }
+
+    function mostrar_check_out_paso_1(){
+        var formulario = mostrar_paso_checkout(plantilla_check_out_1, 1);
+        formulario.on("submit", function(event) {
+            event.preventDefault();
+            if (!this.reportValidity()) return;
+            enviar_paso_checkout(formulario, "restPedidos/paso1", mostrar_check_out_paso_2);
+        });
+    }
+
+    function mostrar_check_out_paso_2(){
+        var formulario = mostrar_paso_checkout(plantilla_check_out_2, 2);
+        formulario.on("submit", function(event) {
+            event.preventDefault();
+            var campoNumero = document.getElementById("numero_tarjeta");
+            campoNumero.setCustomValidity("");
+            var digitos = campoNumero.value.replace(/[\s-]/g, "");
+            if (!numeroTarjetaValido(digitos)) {
+                campoNumero.setCustomValidity(textos.cardNumberInvalid);
+                this.reportValidity();
+                campoNumero.setCustomValidity("");
+                return;
+            }
+            if (!this.reportValidity()) return;
+            enviar_paso_checkout(formulario, "restPedidos/paso2", mostrar_check_out_paso_3);
+        });
+    }
+
+    function numeroTarjetaValido(numero) {
+        if (!/^\d{12,19}$/.test(numero)) return false;
+        var suma = 0;
+        var duplicar = false;
+        for (var indice = numero.length - 1; indice >= 0; indice--) {
+            var digito = Number(numero.charAt(indice));
+            if (duplicar) {
+                digito *= 2;
+                if (digito > 9) digito -= 9;
+            }
+            suma += digito;
+            duplicar = !duplicar;
+        }
+        return suma % 10 === 0;
+    }
+
+    function mostrar_check_out_paso_3(){
+        var formulario = mostrar_paso_checkout(plantilla_check_out_3, 3);
+        formulario.on("submit", function(event) {
+            event.preventDefault();
+            enviar_paso_checkout(formulario, "restPedidos/preferencias", mostrar_resumen_pedido);
+        });
+    }
+
+    function mostrar_error_pedido(xhr){
+        var error = $("#contenedor .checkout-error");
+        if (error.length) {
+            error.text(xhr.responseText || textos.orderError).prop("hidden", false);
+        } else {
+            $("#contenedor").prepend($("<p>").addClass("checkout-error").attr("role", "alert")
+                .text(xhr.responseText || textos.orderError));
+        }
+    }
+
+    function mostrar_resumen_pedido(){
+        $.getJSON("restPedidos/resumen").done(function(pedido){
+            var tarjeta = $("<section>").addClass("checkout-card");
+            var progreso = $("<ol>").addClass("checkout-progress").attr("aria-label", textos.checkoutProgress);
+            [textos.shipping, textos.payment, textos.preferences, textos.reviewTitle].forEach(function(nombre, indice) {
+                var item = $("<li>").text(nombre);
+                if (indice < 3) item.addClass("is-complete");
+                else item.attr("aria-current", "step");
+                progreso.append(item);
+            });
+            tarjeta.append(progreso, $("<h2>").addClass("checkout-title").text(textos.reviewTitle));
+            tarjeta.append($("<p>").addClass("checkout-intro").text(textos.demoPayment));
+            function seccionResumen(titulo, contenido, accion, callback) {
+                var seccion = $("<section>").addClass("checkout-review__section");
+                seccion.append($("<div>").addClass("checkout-review__heading")
+                    .append($("<h3>").text(titulo))
+                    .append($("<button>").attr("type", "button").addClass("checkout-link").text(accion).on("click", callback)));
+                seccion.append($("<p>").text(contenido));
+                tarjeta.append(seccion);
+            }
+            seccionResumen(textos.shippingAddress,
+                pedido.nombreCompleto + " · " + pedido.direccion + " · " + pedido.codigoPostal + " " +
+                pedido.poblacion + " · " + pedido.provincia + " · " + pedido.telefono,
+                textos.editShipping, mostrar_check_out_paso_1);
+            seccionResumen(textos.paymentMethod,
+                (pedido.tipoTarjeta === "visa" ? "VISA" : "Mastercard") + " · " +
+                pedido.numeroTarjeta + " · " + pedido.titularTarjeta + " · " + pedido.fechaCaducidad,
+                textos.editPayment, mostrar_check_out_paso_2);
+            seccionResumen(textos.orderPreferences,
+                pedido.regaloPromocional + " · " + pedido.tipoEmbalaje + " · " + pedido.tallaCalcetinesRegalo,
+                textos.editPreferences, mostrar_check_out_paso_3);
+
+            var listaProductos = $("<ul>").addClass("checkout-review__products");
+            var total = 0;
+            pedido.zapatillas.forEach(function(producto){
+                var precio = Number(producto.PRECIO) || 0;
+                var cantidad = Number(producto.CANTIDAD) || 0;
+                var subtotal = precio * cantidad;
+                total += subtotal;
+                listaProductos.append($("<li>")
+                    .append($("<span>").text(producto.MODELO + " · " + textos.quantity + ": " + cantidad))
+                    .append($("<strong>").text(formatearPrecio(subtotal))));
+            });
+            var productosSeccion = $("<section>").addClass("checkout-review__section");
+            productosSeccion.append($("<h3>").text(textos.products), listaProductos);
+            productosSeccion.append($("<strong>").addClass("checkout-review__total")
+                .text(textos.total + ": " + formatearPrecio(total)));
+            tarjeta.append(productosSeccion);
+            var acciones = $("<div>").addClass("checkout-actions");
+            acciones.append($("<button>").attr("type", "button").addClass("checkout-button checkout-button--secondary")
+                .text(textos.backToCart).on("click", mostrar_productos_carrito));
+            acciones.append($("<button>").attr("type", "button").attr("id", "confirmar_pedido")
+                .addClass("checkout-button").text(textos.confirmOrder));
+            tarjeta.append($("<p>").addClass("checkout-error").attr("role", "alert").prop("hidden", true));
+            tarjeta.append(acciones);
+            $("#contenedor").empty().append(tarjeta);
+            $("#confirmar_pedido").click(function(){
+                var boton = $(this);
+                boton.prop("disabled", true).text(textos.processing);
+                $.post("restPedidos/confirmar")
+                    .done(function() {
+                        checkoutDraft = {};
+                        var exito = $("<section>").addClass("checkout-success").attr("role", "status");
+                        exito.append($("<h2>").text(textos.orderComplete));
+                        exito.append($("<p>").text(textos.demoPayment));
+                        exito.append($("<button>").attr("type", "button").addClass("checkout-button")
+                            .text(textos.continueShopping).on("click", mostrar_zapatillas));
+                        $("#contenedor").empty().append(exito);
+                    })
+                    .fail(function(xhr) {
+                        boton.prop("disabled", false).text(textos.confirmOrder);
+                        mostrar_error_pedido(xhr);
+                    });
+            });
+        }).fail(mostrar_error_pedido);
+    }
+</script>
+
+</body>
+</html>

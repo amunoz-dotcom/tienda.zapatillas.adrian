@@ -1,0 +1,22 @@
+<article class="product-detail-card">
+    <div class="product-detail-category">CATEGORÍA: {{CATEGORIA}}</div>
+    <h2>MODELO: {{MODELO}}</h2>
+    <div class="product-detail-image">
+        <img class="imagen-producto product-detail-image__main" src="mostrar_imagen?id={{ID}}" alt="Imagen de {{MODELO}}" />
+    </div>
+    <div class="product-detail-gallery" role="group" aria-label="Galería de imágenes">
+        {{#IMAGENES}}
+        <button type="button" class="product-detail-gallery__item" aria-label="Ver imagen">
+            <img src="{{MINIATURA}}" data-full-image="{{IMAGEN}}" alt="Imagen del producto" loading="lazy" />
+        </button>
+        {{/IMAGENES}}
+    </div>
+    <div class="product-detail-brand">MARCA: {{MARCA}}</div>
+    <div class="product-detail-price">PRECIO: {{PRECIO}} €</div>
+    <div class="product-detail-attributes">COLOR: {{COLOR}} | TALLA: {{TALLA}}</div>
+    <p class="product-detail-description">DESCRIPCIÓN: {{DESCRIPCION}}</p>
+    <div class="product-detail-actions">
+        <label>CANTIDAD: <input type="number" value="1" min="1"></label>
+        <a href="#" class="btn-cart" onclick="agregarProductoCarrito({{ID}}, this.parentElement.querySelector('input[type=number]').value); return false;">AGREGAR AL CARRITO</a>
+    </div>
+</article>

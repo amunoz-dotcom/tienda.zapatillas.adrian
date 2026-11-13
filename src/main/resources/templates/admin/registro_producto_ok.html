@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{admin.form.product.new}">Registrar zapatilla</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div th:insert="~{fragments/general.html :: menu}"></div>
+<main class="admin-page">
+    <section class="admin-page__card">
+        <h1 class="admin-page__title" th:text="#{admin.form.success}">La zapatilla se ha registrado correctamente.</h1>
+        <p th:text="#{admin.form.success.detail}">Ya puedes verla en la lista de zapatillas.</p>
+        <a class="admin-page__button" th:href="@{/admin/gestionarZapatillas}" th:text="#{admin.form.back}">Volver al listado</a>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<form id="checkout-form" class="checkout-form">
+    <h2 class="checkout-title">Préférences de commande</h2>
+    <p class="checkout-intro">Personnalisez les détails de votre commande.</p>
+    <div class="checkout-fields">
+        <label for="campo_regalo">Cadeau offert</label>
+        <select id="campo_regalo" name="regaloPromocional">
+            <option value="Spray protector de zapatillas">Spray imperméabilisant pour chaussures</option>
+            <option value="Kit de limpieza de zapatillas">Kit de nettoyage express</option>
+            <option value="Cordones extra (Blancos y Negros)">Paire de lacets supplémentaires</option>
+        </select>
+        <label for="campo_embalaje">Emballage</label>
+        <select id="campo_embalaje" name="tipoEmbalaje">
+            <option value="Caja doble reforzada para coleccionistas">Boîte renforcée pour collectionneurs</option>
+            <option value="Embalaje ecológico sin plástico">Emballage écologique sans plastique</option>
+        </select>
+        <label for="campo_talla_calcetines">Taille des chaussettes offertes</label>
+        <select id="campo_talla_calcetines" name="tallaCalcetinesRegalo">
+            <option value="S (35-38)">S (35-38)</option>
+            <option value="M (39-42)">M (39-42)</option>
+            <option value="L (43-46)">L (43-46)</option>
+        </select>
+    </div>
+    <p class="checkout-error" role="alert" hidden></p>
+    <div class="checkout-actions">
+        <button type="button" class="checkout-button checkout-button--secondary" id="checkout-back-payment">Retour au paiement</button>
+        <button type="submit" class="checkout-button" id="aceptar_paso_preferencias">Vérifier la commande</button>
+    </div>
+</form>

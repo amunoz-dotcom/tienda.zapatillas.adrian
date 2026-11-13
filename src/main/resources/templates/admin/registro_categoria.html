@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${categoria.id == 0} ? #{admin.form.category.new} : #{admin.form.category.edit}">Categoría</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div th:insert="~{fragments/general.html :: menu}"></div>
+<main class="admin-page">
+    <h1 class="admin-page__title" th:text="${categoria.id == 0} ? #{admin.form.category.new} : #{admin.form.category.edit}">
+        Registrar categoría
+    </h1>
+    <form class="admin-page__form" th:action="@{/admin/guardarCategoria}" th:object="${categoria}" method="post">
+        <input type="hidden" th:field="*{id}">
+        <label for="nombre" th:text="#{admin.name}">Nombre</label>
+        <input type="text" id="nombre" th:field="*{nombre}" required>
+        <label for="descripcion" th:text="#{admin.description}">Descripción</label>
+        <textarea id="descripcion" th:field="*{descripcion}" rows="4"></textarea>
+        <button type="submit" th:text="${categoria.id == 0} ? #{admin.form.save} : #{admin.form.update}">Guardar</button>
+    </form>
+    <a class="admin-page__back" th:href="@{/admin/gestionarCategorias}" th:text="#{admin.form.back}">Volver al listado</a>
+</main>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{admin.order.details.title}">Detalles del pedido</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div th:insert="~{fragments/general.html :: menu}"></div>
+
+<main class="admin-page">
+    <h1 class="admin-page__title">
+        <span th:text="#{admin.order.details.title}">Detalles del pedido</span> #<span th:text="${pedido.id}"></span>
+    </h1>
+
+    <div class="admin-page__details-grid">
+        <section class="admin-page__panel">
+            <h2 th:text="#{admin.order.shipping}">Datos de envío</h2>
+            <p><strong th:text="#{admin.customer} + ':'">Cliente:</strong> <span th:text="${pedido.nombreCompleto}"></span></p>
+            <p><strong th:text="#{admin.address} + ':'">Dirección:</strong> <span th:text="${pedido.direccion}"></span></p>
+            <p><span th:text="${pedido.poblacion}"></span>, <span th:text="${pedido.provincia}"></span> <span th:text="${pedido.codigoPostal}"></span></p>
+            <p><strong th:text="#{admin.phone} + ':'">Teléfono:</strong> <span th:text="${pedido.telefono}"></span></p>
+        </section>
+
+        <section class="admin-page__panel">
+            <h2 th:text="#{admin.order.preferences}">Preferencias de compra</h2>
+            <p><strong th:text="#{admin.order.gift} + ':'">Regalo:</strong> <span th:text="${pedido.regaloPromocional}"></span></p>
+            <p><strong th:text="#{admin.order.packaging} + ':'">Embalaje:</strong> <span th:text="${pedido.tipoEmbalaje}"></span></p>
+            <p><strong th:text="#{admin.size} + ':'">Talla:</strong> <span th:text="${pedido.tallaCalcetinesRegalo}"></span></p>
+        </section>
+
+        <section class="admin-page__panel">
+            <h2 th:text="#{admin.order.payment}">Datos de pago</h2>
+            <p><strong th:text="#{admin.order.cardType} + ':'">Tipo de tarjeta:</strong> <span th:text="${pedido.tipoTarjeta}"></span></p>
+            <p><strong th:text="#{admin.order.cardholder} + ':'">Titular:</strong> <span th:text="${pedido.titularTarjeta}"></span></p>
+            <p><strong th:text="#{admin.order.cardNumber} + ':'">Número de tarjeta:</strong> <span th:text="${pedido.numeroTarjeta}"></span></p>
+            <p><strong th:text="#{admin.order.expiry} + ':'">Caducidad:</strong> <span th:text="${pedido.fechaCaducidad}"></span></p>
+        </section>
+
+        <section class="admin-page__panel">
+            <h2 th:text="#{admin.order.products}">Productos del pedido</h2>
+            <div th:each="productoPedido : ${pedido.productosPedido}">
+                <p><strong th:text="${productoPedido.zapatilla.modelo}"></strong></p>
+                <p><span th:text="#{admin.order.unitPrice}">Precio por unidad</span>:
+                    <span th:text="|${productoPedido.zapatilla.precio} €|"></span></p>
+                <p><span th:text="#{admin.order.quantity}">Cantidad</span>:
+                    <span th:text="${productoPedido.cantidad}"></span></p>
+            </div>
+        </section>
+    </div>
+
+    <section class="admin-page__panel" style="margin-top: 16px">
+        <p><strong th:text="#{admin.order.state.current} + ':'">Estado actual:</strong>
+            <span th:text="${estados.get(pedido.estado)}"></span></p>
+        <form class="admin-page__card" th:action="@{/admin/actualizarEstadoPedido}" method="post">
+            <input type="hidden" name="id" th:value="${pedido.id}">
+            <label for="estado" th:text="#{admin.order.changeState}">Cambiar estado:</label>
+            <select id="estado" name="estado" required>
+                <option th:each="estado : ${estados}"
+                        th:value="${estado.key}"
+                        th:text="${estado.value}"
+                        th:selected="${estado.key == pedido.estado}"></option>
+            </select>
+            <button type="submit" th:text="#{admin.order.saveState}">Guardar estado</button>
+        </form>
+    </section>
+    <a class="admin-page__back" th:href="@{/admin/gestionarPedidos}" th:text="#{admin.form.back}">Volver al listado</a>
+</main>
+</body>
+</html>

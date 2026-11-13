@@ -1,0 +1,39 @@
+<!-- Envoltorio de la rejilla (Grid) -->
+<div class="product-grid">
+
+    {{#.}}
+    <!-- Tarjeta cuadrada individual por cada producto -->
+    <div class="product-card">
+        <div>CATEGORÍA: {{CATEGORIA}}</div>
+
+        <strong>MODELO: {{MODELO}}</strong>
+
+        <img class="imagen-producto" src="mostrar_miniatura?id={{ID}}" alt="Imagen de {{MODELO}}" loading="lazy" />
+
+        <div>MARCA: {{MARCA}}</div>
+        <div>PRECIO: {{PRECIO}} €</div>
+        <div>COLOR: {{COLOR}}</div>
+        <div>TALLA: {{TALLA}}</div>
+
+        {{#DESCRIPCION}}
+        <div>DESCRIPCIÓN: {{DESCRIPCION}}</div>
+        {{/DESCRIPCION}}
+
+        {{#SKU}}
+        <div>SKU: {{SKU}}</div>
+        {{/SKU}}
+
+        <!-- Botón Ver Detalles -->
+        <a href="#" class="btn-details" onclick="mostrar_detalles({{ID}}); return false;">VER DETALLES</a>
+
+        <div style="margin-top: 6px;">
+            <label>CANTIDAD:</label>
+            <input type="number" value="1" min="1">
+        </div>
+
+        <!-- Botón Agregar al Carrito -->
+        <a href="#" class="btn-cart" onclick="agregarProductoCarrito({{ID}}, this.closest('.product-card').querySelector('input[type=number]').value); return false;">agregar al carrito</a>
+    </div>
+    {{/.}}
+
+</div>

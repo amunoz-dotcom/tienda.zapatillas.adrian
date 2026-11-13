@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="#{admin.orders.title}">Gestión de pedidos</title>
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+<div th:insert="~{fragments/general.html :: menu}"></div>
+
+<main class="admin-page">
+  <h1 class="admin-page__title" th:text="#{admin.orders.title}">Gestión de pedidos</h1>
+  <div class="admin-page__list">
+    <article class="admin-page__card" th:each="p : ${pedidos}">
+      <h2><span th:text="#{admin.order.id}">Pedido</span> #<span th:text="${p.id}"></span></h2>
+      <p><strong th:text="#{admin.customer} + ':'">Cliente:</strong> <span th:text="${p.nombreCompleto}"></span></p>
+      <p><strong th:text="#{admin.address} + ':'">Dirección:</strong> <span th:text="${p.direccion}"></span>,
+        <span th:text="${p.poblacion}"></span> (<span th:text="${p.provincia}"></span> -
+        <span th:text="${p.codigoPostal}"></span>)</p>
+      <p><strong th:text="#{admin.phone} + ':'">Teléfono:</strong> <span th:text="${p.telefono}"></span></p>
+      <p><strong th:text="#{admin.order.state} + ':'">Estado:</strong> <span th:text="${estados.get(p.estado)}"></span></p>
+      <form th:action="@{/admin/actualizarEstadoPedido}" method="post">
+        <input type="hidden" name="id" th:value="${p.id}">
+        <input type="hidden" name="pagina" th:value="${pagina.number}">
+        <input type="hidden" name="volverAlListado" value="true">
+        <label th:for="|estado-${p.id}|" th:text="#{admin.order.changeState}">Cambiar estado</label>
+        <select th:id="|estado-${p.id}|" name="estado" required>
+          <option th:each="estado : ${estados}"
+                  th:value="${estado.key}"
+                  th:text="${estado.value}"
+                  th:selected="${estado.key == p.estado}"></option>
+        </select>
+        <button type="submit" th:text="#{admin.order.saveState}">Guardar estado</button>
+      </form>
+      <p><strong th:text="#{admin.order.gift} + ':'">Regalo seleccionado:</strong> <span th:text="${p.regaloPromocional}"></span></p>
+      <p><strong th:text="#{admin.order.packaging} + ':'">Tipo de embalaje:</strong> <span th:text="${p.tipoEmbalaje}"></span></p>
+      <a class="admin-page__button admin-page__button--secondary"
+         th:href="@{/admin/verDetallesPedido(id=${p.id})}" th:text="#{admin.order.details}">Ver detalles</a>
+    </article>
+  </div>
+
+  <p class="admin-page__empty" th:if="${pedidos.isEmpty()}" th:text="#{admin.orders.empty}">No hay pedidos.</p>
+  <nav class="admin-page__pagination" th:if="${pagina.totalPages > 1}" th:aria-label="#{admin.orders.title}">
+    <a th:if="${pagina.hasPrevious()}" th:href="@{/admin/gestionarPedidos(pagina=${pagina.number - 1})}" th:text="#{admin.previous}">Anterior</a>
+    <span th:text="#{admin.page(${pagina.number + 1},${pagina.totalPages})}">Página</span>
+    <a th:if="${pagina.hasNext()}" th:href="@{/admin/gestionarPedidos(pagina=${pagina.number + 1})}" th:text="#{admin.next}">Siguiente</a>
+  </nav>
+</main>
+</body>
+</html>
